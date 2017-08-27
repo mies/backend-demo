@@ -27,7 +27,7 @@ deploy-to-cluster:
     - bash-template
 
     - script:
-        name: "Show Kubernetes config"
+        name: "show Kubernetes config"
         code: cat kubernetes.yml
 
     - kubectl:
