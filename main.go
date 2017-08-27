@@ -13,7 +13,6 @@ type Response struct {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("hello")
 	data := Response{Title: "hello"}
 	log.Println(data)
 	b, err := json.Marshal(data)
