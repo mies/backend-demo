@@ -1,0 +1,57 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: backend-demo
+  labels:
+    commit: ${WERCKER_GIT_COMMIT}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-demo
+  template:
+    metadata:
+      labels:
+        app: backend-demo
+        commit: ${WERCKER_GIT_COMMIT}
+    spec:
+      containers:
+      - name: backend-demo
+        image: ${DOCKER_REPO}:${WERCKER_GIT_BRANCH}-${WERCKER_GIT_COMMIT}
+        imagePullPolicy: Always
+        ports:
+        - name: backend-demo
+          containerPort: 8000
+          protocol: TCP
+      imagePullSecrets:
+        - name: wercker          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-demo
+  labels:
+    app: backend-demo
+    commit: ${WERCKER_GIT_COMMIT}
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: backend-demo
+    commit: ${WERCKER_GIT_COMMIT}
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: backend-demo-ingress
+spec:
+  rules:
+  - host: backend-demo.example.domain
+    http:
+      paths:
+      - path:
+        backend:
+          serviceName: backend-demo
+          servicePort: 8000
