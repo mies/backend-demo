@@ -1,0 +1,39 @@
+box: golang:1.8
+build:
+  base-path: /go/src/github.com/mies/backend-demo
+  steps:
+    - script:
+        name: fetch dependencies
+        code: go get
+
+    - script:
+        name: build application
+        code: go build
+
+push-release:
+  steps:
+    - internal/docker-push:
+        tag: $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
+        working-dir: /pipeline/source
+        ports: "8000"
+        cmd: ./backend-demo
+
+deploy-to-cluster:
+    box:
+        id: alpine
+        cmd: /bin/sh
+    steps:
+
+    - bash-template
+
+    - script:
+        name: "Show Kubernetes config"
+        code: cat kubernetes.yml
+
+    - kubectl:
+        name: deploy to kubernetes
+        server: $KUBERNETES_MASTER
+        username: $KUBERNETES_USERNAME
+        token: $KUBERNETES_PASSWORD
+        insecure-skip-tls-verify: true
+        command: apply -f kubernetes.yml
