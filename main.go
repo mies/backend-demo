@@ -14,14 +14,12 @@ type Response struct {
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	data := Response{Title: "hello"}
-	log.Println(data)
 	b, err := json.Marshal(data)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Println(b)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(b)
 }
